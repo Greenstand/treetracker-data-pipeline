@@ -25,24 +25,6 @@ const pool = new Pool({
     console.log(row);
     const bulkData = row.bulk_data;
     const requests = [];
-    if(bulkData.trees != null){
-      for(let tree of bulkData.trees){
-        console.log(tree);
-
-        var options = {
-          method: 'POST',
-          uri: Config.dataInputMicroserviceURI + "tree",
-          body: tree,
-          json: true // Automatically stringifies the body to JSON
-        };
-
-        const promise = rp(options);
-        requests.push(promise);
-      
-      }
-
-    }
-
     if(bulkData.registrations != null){
 
       for(let planter of bulkData.registrations){
@@ -60,6 +42,11 @@ const pool = new Pool({
       
       }
     }
+
+    const result1 = await Promise.all(requests);
+    console.log(result1);
+    requests = []
+
 
     if(bulkData.devices != null){
 
@@ -81,8 +68,34 @@ const pool = new Pool({
     }
 
 
-    const result = await Promise.all(requests);
-    console.log(result);
+    const result2 = await Promise.all(requests);
+    console.log(result2);
+    requests = []
+
+
+    if(bulkData.trees != null){
+      for(let tree of bulkData.trees){
+        console.log(tree);
+
+        var options = {
+          method: 'POST',
+          uri: Config.dataInputMicroserviceURI + "tree",
+          body: tree,
+          json: true // Automatically stringifies the body to JSON
+        };
+
+        const promise = rp(options);
+        requests.push(promise);
+      
+      }
+
+    }
+
+
+    const result3 = await Promise.all(requests);
+    console.log(result3);
+    requests = []
+
 
     const update = {
       text: `UPDATE bulk_tree_upload
