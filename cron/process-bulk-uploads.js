@@ -43,8 +43,12 @@ const pool = new Pool({
       }
     }
 
-    const result1 = await Promise.all(requests);
-    console.log(result1);
+    try {
+      const result1 = await Promise.all(requests);
+      console.log(result1);
+    } catch (e => {
+      continue;
+    })
     requests = []
 
 
@@ -68,8 +72,12 @@ const pool = new Pool({
     }
 
 
-    const result2 = await Promise.all(requests);
-    console.log(result2);
+    try {
+      const result2 = await Promise.all(requests);
+      console.log(result2);
+    } catch (e => {
+      continue;
+    })
     requests = []
 
 
@@ -92,8 +100,12 @@ const pool = new Pool({
     }
 
 
-    const result3 = await Promise.all(requests);
-    console.log(result3);
+    try {
+      const result3 = await Promise.all(requests);
+      console.log(result3);
+    } catch (e => {
+      continue;
+    })
     requests = []
 
 
@@ -115,7 +127,7 @@ const pool = new Pool({
 })().catch(e => {
 
   console.log(e);
-  //Sentry.captureException(e);
+  Sentry.captureException(e);
   pool.end();
 
   console.log('notify-slack-reports done with catch');
