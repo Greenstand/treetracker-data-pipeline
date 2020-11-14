@@ -127,16 +127,21 @@ class Data {
   }
 
   async findUser(identifier){
-    return await this.findOrCreateUser(identifier, "Anonymous", "Planter", "");
-  }
-
-  async findOrCreateUser(identifier, first_name, last_name, organization){
       let query = {
       text: 'SELECT * FROM planter WHERE phone = $1 OR email = $1',
       values: [identifier]
       }
       const data = await this.pool.query(query);
-      if(data.rows.length == 0){
+      if(data.rows.length != 0){
+        return data.rows[0]
+      } else {
+        return null
+      }
+  }
+
+  async findOrCreateUser(identifier, first_name, last_name, organization){
+      const user = await this.findUser(identifier)
+      if(user == null){
           var reg = new RegExp('^\\d+$');
           var query2 = null;
           if(reg.test(identifier)){
@@ -154,7 +159,7 @@ class Data {
           return rval.rows[0];
 
       } else {
-        return data.rows[0]
+        return user
       }
   }
 

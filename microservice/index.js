@@ -61,6 +61,11 @@ app.post('/planter', async (req, res) => {
 
 app.post('/tree', async (req, res) => {
     const user = await data.findUser(req.body.planter_identifier);
+    if(user == null){
+      res.status(404).json({'error' : 'planter not found ' + req.body.planter_identifier})
+      return
+    }
+
     var duplicate = null;
     if(req.body.uuid !== null 
       && req.body.uuid !== undefined

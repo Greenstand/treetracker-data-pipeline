@@ -19,34 +19,16 @@ const pool = new Pool({
     WHERE processed = FALSE`
   };
   const rval = await pool.query(query);
-  console.log(rval.rows);
+  //console.log(rval.rows);
 
   for(let row of rval.rows){
-    console.log(row);
+    console.log(row.id);
     const bulkData = row.bulk_data;
-    const requests = [];
-    if(bulkData.trees != null){
-      for(let tree of bulkData.trees){
-        console.log(tree);
-
-        var options = {
-          method: 'POST',
-          uri: Config.dataInputMicroserviceURI + "tree",
-          body: tree,
-          json: true // Automatically stringifies the body to JSON
-        };
-
-        const promise = rp(options);
-        requests.push(promise);
-      
-      }
-
-    }
-
+    var requests = [];
     if(bulkData.registrations != null){
 
       for(let planter of bulkData.registrations){
-        console.log(planter);
+        //console.log(planter);
 
         var options = {
           method: 'POST',
@@ -61,10 +43,20 @@ const pool = new Pool({
       }
     }
 
+    try {
+      const result1 = await Promise.all(requests);
+      console.log(result1);
+    } catch (e)  {
+      console.log(e)
+      continue;
+    }
+    requests = []
+
+
     if(bulkData.devices != null){
 
       for(let device of bulkData.devices){
-        console.log(device);
+      //  console.log(device);
 
         var options = {
           method: 'PUT',
@@ -81,8 +73,45 @@ const pool = new Pool({
     }
 
 
-    const result = await Promise.all(requests);
-    console.log(result);
+    try {
+      const result2 = await Promise.all(requests);
+      //console.log(result2);
+    } catch (e) {
+      console.log(e)
+      continue;
+    }
+    requests = []
+
+
+    if(bulkData.trees != null){
+      for(let tree of bulkData.trees){
+        //console.log(tree);
+
+        var options = {
+          method: 'POST',
+          uri: Config.dataInputMicroserviceURI + "tree",
+          body: tree,
+          json: true // Automatically stringifies the body to JSON
+        };
+
+        const promise = rp(options);
+        requests.push(promise);
+      
+      }
+
+    }
+
+
+    try {
+      const result3 = await Promise.all(requests);
+      //console.log(result3);
+    } catch (e) {
+      console.log('some tree requests failed')
+      console.log(e.message)
+      continue;
+    }
+    requests = []
+
 
     const update = {
       text: `UPDATE bulk_tree_upload
@@ -102,7 +131,7 @@ const pool = new Pool({
 })().catch(e => {
 
   console.log(e);
-  //Sentry.captureException(e);
+  Sentry.captureException(e);
   pool.end();
 
   console.log('notify-slack-reports done with catch');
