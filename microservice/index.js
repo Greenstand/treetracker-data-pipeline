@@ -73,27 +73,31 @@ app.post('/tree', async (req, res) => {
       && req.body.uuid !== ""){
       duplicate  = await data.checkForExistingTree(req.body.uuid);
     }
-    console.log(`capture in field data schema for ${req.body.uuid} has duplicates ${duplicate === null}`);
     if(duplicate !== null){
       res.status(200).json({ duplicate });
     } else {
-       // translate to field-data capture api
-       const tree = req.body
-       const capture = { 
-        ...tree,
-        id: tree.uuid,
-        planter_id: tree.user_id
-      };
-      var options = {
-        method: 'POST',
-        uri: config.fieldDataURI + "captures",
-        body: capture,
-        json: true // Automatically stringifies the body to JSON
-      };
-
-      const fieldCapture = await rp(options);
-      console.log("created field data tree capture " + fieldCapture.id);
-      res.status(201).json({ fieldCapture });
+      if(config.useFieldDataService) {
+        // translate to field-data capture payload
+        const tree = req.body
+        const capture = { 
+          ...tree,
+          id: tree.uuid,
+          planter_id: tree.user_id
+        };
+        var options = {
+          method: 'POST',
+          uri: config.fieldDataURI + "captures",
+          body: capture,
+          json: true // Automatically stringifies the body to JSON
+        };
+        const fieldCapture = await rp(options);
+        console.log("created field data tree capture " + fieldCapture.id);
+        res.status(201).json({ fieldCapture });
+      } else {
+        const tree = await data.createTree( user.id, req.body.device_identifier, req.body);
+        console.log("created tree " + tree.uuid);
+        res.status(201).json({ tree });
+      }
     }
 });
 
