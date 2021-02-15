@@ -1,3 +1,4 @@
+require('dotenv').config();
 const Config = require('./config/config');
 const http = require('http');
 const rp = require('request-promise-native');
