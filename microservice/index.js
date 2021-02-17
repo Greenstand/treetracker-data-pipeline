@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 require('express-async-errors');
 const Sentry = require('@sentry/node');
