@@ -4,7 +4,6 @@ const http = require('http');
 const rp = require('request-promise-native');
 const { Pool, Client } = require('pg');
 
-console.log(Config);
 const pool = new Pool({
   connectionString: Config.connectionString
 });
