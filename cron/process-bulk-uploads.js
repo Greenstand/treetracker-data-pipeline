@@ -8,10 +8,6 @@ const pool = new Pool({
   connectionString: Config.connectionString
 });
 
-//const Sentry = require('@sentry/node');
-//Sentry.init({ dsn: Config.sentryDSN });
-
-
 (async () => {
 
   const query = {
@@ -132,7 +128,6 @@ const pool = new Pool({
 })().catch(e => {
 
   console.log(e);
-  Sentry.captureException(e);
   pool.end();
 
   console.log('notify-slack-reports done with catch');
